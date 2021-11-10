@@ -1,5 +1,10 @@
-const { Client, Intents } = require('discord.js');
-const config = require("../config.json");
+import { Client, Intents } from 'discord.js';
+import dotenv from 'dotenv';
+import secret from '../secret.js';
+import config from '../config.js';
+import { onMessage, onReady } from "./msgeventhandler.js";
+
+dotenv.config();
 
 const client = new Client({
     intents: [
@@ -7,8 +12,8 @@ const client = new Client({
         Intents.FLAGS.GUILD_MESSAGES]
 });
 
-client.once('ready', () => {
-    console.log('Ready!');
-});
+client.login(secret.BOT_LOGIN_TOKEN);
 
-client.login(config.BOT_TOKEN);
+client.on('ready', () => onReady(client));
+client.on("messageCreate",msg => onMessage(client, msg));
+

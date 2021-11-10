@@ -1,0 +1,4 @@
+/node_modules
+/dump.rdb
+src/.env
+secret.js

@@ -1,19 +1,12 @@
-import { Client, Intents } from 'discord.js';
-import dotenv from 'dotenv';
+import { Intents } from 'discord.js';
 import secret from '../secret.js';
-import config from '../config.js';
-import { onMessage, onReady } from "./msgeventhandler.js";
+import DiscordClient from './client.js';
 
-dotenv.config();
-
-const client = new Client({
+const CustomClient = new DiscordClient({
     intents: [
         Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_MESSAGES]
 });
 
-client.login(secret.BOT_LOGIN_TOKEN);
-
-client.on('ready', () => onReady(client));
-client.on("messageCreate",msg => onMessage(client, msg));
+CustomClient.start(secret.BOT_LOGIN_TOKEN);
 

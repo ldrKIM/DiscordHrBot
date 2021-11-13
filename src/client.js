@@ -1,8 +1,8 @@
 import {Client, Collection} from 'discord.js';
 import YouTube from 'simple-youtube-api';
 import secret from '../secret.js';
-import glob from 'glob';
-import FileResolve from 'path';
+import fs from 'fs';
+import path from 'path';
 import {onMessage, onReady} from "./msgeventhandler.js";
 
 export default class DiscordClient extends Client {
@@ -12,29 +12,47 @@ export default class DiscordClient extends Client {
         this.queue = new Map();
         this.commands = new Collection();
         this.youtube = new YouTube(secret.YOUTUBE_TOKEN);
-        this.setCommand();
+        this.setCommand('command');
         this.once('ready', () => onReady(this));
         this.on("messageCreate",msg => onMessage(this, msg));
     }
 
-    setCommand() {
-        const commandFiles = glob.sync('./src/command/*.js');
+     setCommand() {
+        const FilePath = './src/command';
+        const commandFileList = fs.readdirSync(FilePath).filter(file => file.endsWith('.js'));
+        //this.getCommand(commandFileList, 'command');
 
-        for (let commandFilePath of commandFiles) {
-            commandFilePath = FileResolve.resolve(commandFilePath);
-            console.log(commandFilePath);
+        if (commandFileList.length) {
+            commandFileList.forEach(async (file) => {
+                const srcDir = './command/' + file;
+                let module;
+                console.log(srcDir);
+                await import(srcDir)
+                    .then((s) => {
+                        console.log(s);
+                        module = new s.default();
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    })
+                console.log(module)
+                this.commands.set(module.name, module);
+            });
+        }
+    }
 
-            //파일 가져와야 하는 부분
-            let File = null;
-            import(commandFilePath).then((importedModule) => {
-                File = importedModule;
-            })
+    async getCommand(commandFileList, directory) {
+        if (commandFileList.length) {
+            const srcDir = 'file://' + path.resolve() + '/src';
+            console.log(`${srcDir}/${directory}/`);
+            const commandModuleList = commandFileList.map(filename => import(`${srcDir}/${directory}/${filename}`));
+            const resolvedModules = await Promise.all(commandModuleList);
+            const ready = resolvedModules.map(module => {
+                const { name, action, description = '' } = module.default;
+                if (name && action) return [name, { action, description }];
+            });
 
-            console.log(File);
-
-            const command = new File(this);
-            command.client = this;
-            this.commands.set(command.name, command);
+            return Client.Collection()
         }
     }
 

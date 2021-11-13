@@ -5,3 +5,4 @@ export default class Command {
         this.description = options.description || 'No description';
     }
 }
+

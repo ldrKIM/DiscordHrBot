@@ -1,13 +1,13 @@
-import Command from '../command';
+import Command from '../command.js';
 
-export class PingCommand extends Command {
+export default class PingCommand extends Command {
     constructor() {
         super('ping', {
             description: 'Pong!'
         });
     }
 
-    async excute(message) {
+    async execute(message) {
         const msg = await message.channel.send('Pinging...');
     }
 }

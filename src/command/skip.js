@@ -3,11 +3,11 @@ import Command from '../command.js';
 export default class SkipCommand extends Command {
     constructor() {
         super('skip', {
-            description: 'Skip!'
+            description: 'Skip!',
+            aliases: ['fs']
         });
     }
 
-    async execute(message) {
-        const msg = await message.channel.send('skip...');
+    async execute(client, msg) {
     }
 }

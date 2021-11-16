@@ -7,7 +7,9 @@ export default class PingCommand extends Command {
         });
     }
 
-    async execute(message) {
-        const msg = await message.channel.send('Pinging...');
+    async execute(client, msg) {
+        console.log(client);
+        await msg.channel.send("Your Ping is " + msg.createdTimestamp + ", Bot's ping is " + client.ws.ping);
+
     }
 }
